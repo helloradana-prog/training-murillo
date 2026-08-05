@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Murillo — Treino</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Unbounded:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0A0E15;
+    --surface:#141A24;
+    --surface-2:#1C2431;
+    --surface-3:#232C3B;
+    --border:#2A3342;
+    --blue:#3E7BFA;
+    --blue-light:#7FADFF;
+    --blue-dim:#152743;
+    --gray:#8B96A8;
+    --gray-light:#B7C0CD;
+    --text:#F4F6F9;
+    --text-dim:#C9D1DC;
+    --success:#3DDC97;
+    --warn:#F5B94D;
+    --danger:#F2685C;
+    --radius:16px;
+    --radius-sm:10px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 100% -10%, rgba(62,123,250,0.14), transparent 60%),
+      radial-gradient(900px 500px at -10% 110%, rgba(62,123,250,0.10), transparent 60%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    padding-bottom:92px;
+  }
+  h1,h2,h3,.display{font-family:'Space Grotesk', sans-serif;}
+  .mono{font-family:'JetBrains Mono', monospace;}
+
+  header{
+    padding:22px 20px 16px;
+    position:sticky; top:0; z-index:20;
+    background:linear-gradient(180deg, rgba(10,14,21,0.97), rgba(10,14,21,0.88));
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+  }
+  .brand-row{display:flex; align-items:center; justify-content:space-between;}
+  .brand{display:flex; align-items:center; gap:12px;}
+  .brand .mark{
+    width:40px;height:40px;border-radius:11px;
+    background:linear-gradient(155deg, var(--blue), #1E4FBF);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:18px; color:#fff;
+    box-shadow:0 6px 18px rgba(62,123,250,0.35);
+  }
+  .fashion{font-family:'Unbounded', sans-serif;}
+  .brand-name{font-family:'Unbounded', sans-serif; font-size:18px; font-weight:700; letter-spacing:0.2px;}
+  .brand-sub{font-size:12.5px; color:var(--gray); font-weight:500; margin-top:1px;}
+  .pill{
+    font-family:'JetBrains Mono', monospace; font-size:11.5px; font-weight:600;
+    color:var(--blue-light); background:var(--blue-dim); border:1px solid rgba(62,123,250,0.35);
+    padding:6px 10px; border-radius:20px; white-space:nowrap;
+  }
+
+  main{padding:18px 16px 8px; max-width:640px; margin:0 auto;}
+
+  nav.tabbar{
+    position:fixed; bottom:0; left:0; right:0; z-index:30;
+    background:rgba(16,21,30,0.96); backdrop-filter:blur(14px);
+    border-top:1px solid var(--border);
+    display:flex; padding:8px 8px calc(8px + env(safe-area-inset-bottom));
+  }
+  nav.tabbar button{
+    flex:1; background:none; border:none; color:var(--gray);
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+    padding:8px 4px; font-family:'Inter', sans-serif; font-size:11.5px; font-weight:600;
+    border-radius:12px; cursor:pointer; transition:.15s;
+  }
+  nav.tabbar button svg{width:22px; height:22px; stroke:var(--gray); transition:.15s;}
+  nav.tabbar button.active{color:var(--blue-light); background:var(--blue-dim);}
+  nav.tabbar button.active svg{stroke:var(--blue-light);}
+
+  .view{display:none; animation:fade .25s ease;}
+  .view.active{display:block;}
+  @keyframes fade{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+  .segment{
+    display:flex; background:var(--surface); border:1px solid var(--border);
+    border-radius:14px; padding:4px; gap:4px; margin-bottom:16px;
+  }
+  .segment button{
+    flex:1; padding:11px 0; border:none; background:none; color:var(--gray-light);
+    font-family:'Unbounded', sans-serif; font-weight:700; font-size:13px;
+    border-radius:11px; cursor:pointer; transition:.15s;
+  }
+  .segment button.active{background:linear-gradient(155deg, var(--blue), #1E4FBF); color:#fff; box-shadow:0 4px 14px rgba(62,123,250,.35);}
+
+  .week-row{display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;}
+  .week-label{font-size:13px; color:var(--gray); font-weight:600; text-transform:uppercase; letter-spacing:.6px;}
+  .week-ctrl{display:flex; align-items:center; gap:10px; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:5px 6px;}
+  .week-ctrl button{width:30px; height:30px; border-radius:8px; border:none; background:var(--surface-3); color:var(--text); font-size:17px; font-weight:700; cursor:pointer;}
+  .week-ctrl span{font-family:'JetBrains Mono', monospace; font-weight:700; font-size:15px; min-width:60px; text-align:center;}
+
+  .ex-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+    padding:16px; margin-bottom:12px; position:relative; overflow:hidden;
+  }
+  .ex-card.done{border-color:rgba(61,220,151,0.5); background:linear-gradient(180deg, rgba(61,220,151,0.07), var(--surface) 40%);}
+  .ex-card.principal{border-color:rgba(62,123,250,0.55); background:linear-gradient(180deg, rgba(62,123,250,0.10), var(--surface) 45%);}
+  .ex-top{display:flex; align-items:flex-start; gap:12px;}
+  .checkbox{
+    flex:none; width:26px; height:26px; border-radius:8px; border:2px solid var(--gray);
+    display:flex; align-items:center; justify-content:center; cursor:pointer; margin-top:2px;
+    transition:.15s; background:var(--surface-2);
+  }
+  .checkbox.checked{background:var(--success); border-color:var(--success);}
+  .checkbox svg{width:15px; height:15px; opacity:0; transition:.15s; stroke:#08150F;}
+  .checkbox.checked svg{opacity:1;}
+  .ex-info{flex:1; min-width:0;}
+  .ex-tag{font-size:11px; font-weight:700; letter-spacing:.6px; text-transform:uppercase; color:var(--blue-light);}
+  .ex-tag.core{color:var(--warn);}
+  .ex-name{font-family:'Space Grotesk', sans-serif; font-size:17px; font-weight:600; margin-top:2px; line-height:1.25;}
+  .ex-note{font-size:12.5px; color:var(--gray); margin-top:6px; line-height:1.45;}
+
+  .ex-stats{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:14px;}
+  .stat{background:var(--surface-2); border-radius:var(--radius-sm); padding:8px 6px; text-align:center;}
+  .stat .v{font-family:'JetBrains Mono', monospace; font-weight:700; font-size:15px; color:var(--text);}
+  .stat .l{font-size:9.5px; color:var(--gray); text-transform:uppercase; letter-spacing:.5px; margin-top:2px;}
+
+  .peso-row{display:flex; align-items:center; gap:8px; margin-top:12px;}
+  .peso-row label{font-size:12.5px; color:var(--gray-light); font-weight:600; flex:none;}
+  .peso-row input{
+    width:72px; flex:none; background:var(--surface-2); border:1.5px solid var(--border); border-radius:10px;
+    padding:8px 10px; color:var(--text); font-family:'JetBrains Mono', monospace; font-size:14px; font-weight:600; text-align:center;
+  }
+  .peso-row input:focus{outline:none; border-color:var(--blue);}
+  .peso-row span.unit{color:var(--gray); font-size:12.5px;}
+
+  .warmup-note{
+    background:var(--surface); border:1px dashed var(--border); border-radius:var(--radius-sm);
+    padding:12px 14px; margin-bottom:14px; font-size:13px; color:var(--gray-light); line-height:1.5;
+  }
+  .warmup-note b{color:var(--text);}
+
+  .sec-title{font-family:'Space Grotesk', sans-serif; font-size:18px; font-weight:700; margin:22px 0 12px; display:flex; align-items:center; gap:8px;}
+  .sec-title:first-child{margin-top:0;}
+  .sec-title .dot{width:8px; height:8px; border-radius:50%; background:var(--blue);}
+
+  .guia-card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:14px 16px; margin-bottom:10px;}
+  .guia-card .g-name{font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:15.5px; color:var(--blue-light);}
+  .guia-card .g-how{font-size:13.5px; color:var(--text-dim); margin-top:6px; line-height:1.5;}
+  .guia-card .g-care{font-size:12.5px; color:var(--warn); margin-top:8px; line-height:1.5; display:flex; gap:6px;}
+
+  .rpe-row{display:flex; gap:12px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px 14px; margin-bottom:8px; align-items:center;}
+  .rpe-badge{
+    flex:none; width:52px; height:38px; border-radius:8px; background:var(--blue-dim); border:1px solid rgba(62,123,250,.4);
+    display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono', monospace; font-weight:700; color:var(--blue-light); font-size:13px;
+  }
+  .rpe-text{font-size:13px; color:var(--text-dim); line-height:1.4;}
+
+  .subtabs{display:flex; gap:8px; margin-bottom:16px;}
+  .subtabs button{
+    flex:1; padding:10px; border-radius:12px; border:1px solid var(--border); background:var(--surface);
+    color:var(--gray-light); font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:14px; cursor:pointer;
+  }
+  .subtabs button.active{background:var(--blue-dim); color:var(--blue-light); border-color:rgba(62,123,250,.5);}
+  .subview{display:none;}
+  .subview.active{display:block;}
+
+  .field{margin-bottom:18px;}
+  .field label{display:block; font-size:13.5px; font-weight:600; color:var(--text-dim); margin-bottom:9px;}
+  .scale5{display:flex; gap:8px; justify-content:center;}
+  .scale5 button{
+    flex:none; width:42px; height:42px; border-radius:11px; border:1.5px solid var(--border); background:var(--surface);
+    color:var(--gray-light); font-family:'JetBrains Mono', monospace; font-weight:700; font-size:14px; cursor:pointer; transition:.15s;
+  }
+  .scale5 button.sel{background:linear-gradient(155deg, var(--blue), #1E4FBF); color:#fff; border-color:transparent; box-shadow:0 4px 14px rgba(62,123,250,.35);}
+  .scale-caption{display:flex; justify-content:space-between; font-size:10.5px; color:var(--gray); margin-top:6px;}
+  textarea, select, input.text{
+    width:100%; background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius-sm);
+    padding:12px 14px; color:var(--text); font-family:'Inter', sans-serif; font-size:14.5px; resize:vertical;
+  }
+  textarea:focus, select:focus, input.text:focus{outline:none; border-color:var(--blue);}
+  .btn-primary{
+    width:100%; padding:15px; border:none; border-radius:14px; margin-top:6px;
+    background:linear-gradient(155deg, var(--blue), #1E4FBF); color:#fff;
+    font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:16px; letter-spacing:.2px;
+    cursor:pointer; box-shadow:0 8px 22px rgba(62,123,250,.3);
+  }
+  .btn-primary:active{transform:scale(.98);}
+  .toast{
+    position:fixed; bottom:100px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--surface-3); border:1px solid var(--success); color:var(--text);
+    padding:12px 20px; border-radius:12px; font-size:13.5px; font-weight:600; opacity:0; pointer-events:none;
+    transition:.25s; z-index:50; display:flex; align-items:center; gap:8px; white-space:nowrap;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+  .toast svg{width:16px; height:16px; stroke:var(--success);}
+
+  .profile-hero{
+    background:linear-gradient(160deg, var(--blue-dim), var(--surface) 70%);
+    border:1px solid var(--border); border-radius:var(--radius); padding:20px; margin-bottom:16px; text-align:center;
+  }
+  .profile-hero .avatar{
+    width:64px; height:64px; border-radius:18px; margin:0 auto 12px; background:linear-gradient(155deg, var(--blue), #1E4FBF);
+    display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:26px; color:#fff;
+  }
+  .profile-hero h2{margin:0; font-size:22px; font-family:'Unbounded', sans-serif; font-weight:700;}
+  .profile-hero p{margin:4px 0 0; color:var(--gray); font-size:13px;}
+  .info-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px;}
+  .info-cell{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px 14px;}
+  .info-cell .l{font-size:10.5px; color:var(--gray); text-transform:uppercase; letter-spacing:.5px; font-weight:700;}
+  .info-cell .v{font-size:14.5px; font-weight:600; margin-top:4px; line-height:1.35;}
+  .info-full{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px 16px; margin-bottom:10px;}
+  .info-full .l{font-size:10.5px; color:var(--gray); text-transform:uppercase; letter-spacing:.5px; font-weight:700;}
+  .info-full .v{font-size:13.5px; margin-top:6px; color:var(--text-dim); line-height:1.5;}
+  .weight-editor{background:var(--surface); border:1px solid var(--blue); border-radius:var(--radius); padding:16px; margin-bottom:16px; display:flex; align-items:center; gap:14px;}
+  .weight-editor .l{flex:1;}
+  .weight-editor .l .t{font-size:12.5px; color:var(--gray); font-weight:600; text-transform:uppercase; letter-spacing:.5px;}
+  .weight-editor input{
+    width:100px; background:var(--surface-2); border:1.5px solid var(--border); border-radius:10px;
+    padding:10px; color:var(--blue-light); font-family:'JetBrains Mono', monospace; font-weight:700; font-size:20px; text-align:center;
+  }
+  .weight-editor input:focus{outline:none; border-color:var(--blue);}
+  .warn-box{background:rgba(242,104,92,0.08); border:1px solid rgba(242,104,92,0.35); border-radius:var(--radius-sm); padding:14px 16px; margin-top:6px;}
+  .warn-box .l{font-size:11px; color:var(--danger); font-weight:700; text-transform:uppercase; letter-spacing:.5px; margin-bottom:8px;}
+  .warn-box ul{margin:0; padding-left:18px; color:var(--text-dim); font-size:13px; line-height:1.6;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand-row">
+    <div class="brand">
+      <div class="mark">M</div>
+      <div>
+        <div class="brand-name">Murillo</div>
+        <div class="brand-sub">Plano de treino — Hellora Consultoria</div>
+      </div>
+    </div>
+    <div class="pill" id="syncPill">sincronizado</div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ================= TREINO ================= -->
+  <section id="view-treino" class="view active">
+    <div class="segment" id="treinoSegment">
+      <button data-treino="A" class="active">Treino A</button>
+      <button data-treino="B">Treino B</button>
+      <button data-treino="C">Treino C</button>
+    </div>
+
+    <div class="week-row">
+      <span class="week-label">Acompanhamento</span>
+      <div class="week-ctrl">
+        <button id="weekMinus">−</button>
+        <span id="weekLabel">Semana 1</span>
+        <button id="weekPlus">+</button>
+      </div>
+    </div>
+
+    <div class="warmup-note" id="warmupNote"></div>
+
+    <div id="exerciseList"></div>
+
+    <button class="btn-primary" id="btnSalvarTreino" style="margin-top:8px; margin-bottom:20px;">Salvar treino completo</button>
+  </section>
+
+  <!-- ================= GUIA ================= -->
+  <section id="view-guia" class="view">
+    <div class="subtabs">
+      <button data-sub="execucao" class="active">Execução</button>
+      <button data-sub="intensidade">Intensidade (RPE)</button>
+    </div>
+
+    <div id="sub-execucao" class="subview active"></div>
+
+    <div id="sub-intensidade" class="subview">
+      <div id="rpeList"></div>
+      <div class="warn-box" style="margin-top:14px;">
+        <div class="l">Recomendação para Murillo</div>
+        <ul>
+          <li>Trabalhar entre RPE 6 e 8 na maior parte do treino.</li>
+          <li>Na barra fixa (principal), manter RPE 7-8 — como já faz 10 reps fácil, usar lastro se precisar.</li>
+          <li>Evitar RPE 9-10 em exercícios que envolvam cotovelo/rádio, joelho direito ou ombro esquerdo.</li>
+          <li>Se sentir dor (não apenas esforço), reduzir o RPE-alvo ou trocar o exercício.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= AVALIAÇÃO ================= -->
+  <section id="view-avaliacao" class="view">
+    <div class="sec-title"><span class="dot"></span>Como foi sua semana?</div>
+
+    <div class="field">
+      <label>Frequência — quantos treinos você concluiu?</label>
+      <select id="evalFrequencia">
+        <option value="0">0 de 3 treinos</option>
+        <option value="1">1 de 3 treinos</option>
+        <option value="2">2 de 3 treinos</option>
+        <option value="3">3 de 3 treinos</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Humor</label>
+      <div class="scale5" data-field="humor">
+        <button data-val="1">1</button><button data-val="2">2</button><button data-val="3">3</button><button data-val="4">4</button><button data-val="5">5</button>
+      </div>
+      <div class="scale-caption"><span>Ruim</span><span>Ótimo</span></div>
+    </div>
+
+    <div class="field">
+      <label>Sono</label>
+      <div class="scale5" data-field="sono">
+        <button data-val="1">1</button><button data-val="2">2</button><button data-val="3">3</button><button data-val="4">4</button><button data-val="5">5</button>
+      </div>
+      <div class="scale-caption"><span>Ruim</span><span>Ótimo</span></div>
+    </div>
+
+    <div class="field">
+      <label>Alimentação</label>
+      <div class="scale5" data-field="alimentacao">
+        <button data-val="1">1</button><button data-val="2">2</button><button data-val="3">3</button><button data-val="4">4</button><button data-val="5">5</button>
+      </div>
+      <div class="scale-caption"><span>Fora do plano</span><span>Muito regrada</span></div>
+    </div>
+
+    <div class="field">
+      <label>Energia</label>
+      <div class="scale5" data-field="energia">
+        <button data-val="1">1</button><button data-val="2">2</button><button data-val="3">3</button><button data-val="4">4</button><button data-val="5">5</button>
+      </div>
+      <div class="scale-caption"><span>Baixa</span><span>Alta</span></div>
+    </div>
+
+    <div class="field">
+      <label>Observações (dores, viagens, dificuldades...)</label>
+      <textarea id="evalObs" rows="4" placeholder="Escreva aqui..."></textarea>
+    </div>
+
+    <button class="btn-primary" id="btnEnviarAvaliacao">Enviar avaliação</button>
+  </section>
+
+  <!-- ================= PERFIL ================= -->
+  <section id="view-perfil" class="view">
+    <div class="profile-hero">
+      <div class="avatar">M</div>
+      <h2>Murillo</h2>
+      <p>30 anos · 1,74 m · Emagrecimento + hipertrofia + saúde</p>
+    </div>
+
+    <div class="weight-editor">
+      <div class="l">
+        <div class="t">Peso atual</div>
+        <div style="font-size:12px; color:var(--gray); margin-top:2px;">Atualize sempre que pesar</div>
+      </div>
+      <input type="number" id="pesoInput" step="0.1" value="90">
+      <span class="unit mono" style="color:var(--gray)">kg</span>
+    </div>
+
+    <div class="warn-box">
+      <div class="l">Pontos de atenção</div>
+      <ul>
+        <li>Rádio e cotovelo operados (fratura anterior) — cuidado com carga axial.</li>
+        <li>Dor ocasional no joelho direito e no ombro esquerdo.</li>
+        <li>Já executa barra fixa normal, hoje faz 10 repetições.</li>
+      </ul>
+    </div>
+  </section>
+
+</main>
+
+<nav class="tabbar">
+  <button data-view="treino" class="active">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4v16M18 4v16M2 9h4M18 9h4M2 15h4M18 15h4M6 12h12"/></svg>
+    Treino
+  </button>
+  <button data-view="guia">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4a1 1 0 0 0-1-1H6.5A2.5 2.5 0 0 0 4 5.5v14z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20"/></svg>
+    Guia
+  </button>
+  <button data-view="avaliacao">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    Avaliação
+  </button>
+  <button data-view="perfil">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-7 8-7s8 3 8 7"/></svg>
+    Perfil
+  </button>
+</nav>
+
+<div class="toast" id="toast"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span id="toastMsg">Salvo</span></div>
+
+<script>
+/* ============================================================
+   CONFIG — FIREBASE / ALUNO
+   ============================================================ */
+const FIREBASE_URL = 'https://helloradana-consultoria-default-rtdb.firebaseio.com';
+const ALUNO_ID = 'murillo';
+const STATE_URL = `${FIREBASE_URL}/alunos/${ALUNO_ID}/state.json`;
+const LOCAL_KEY = 'murillo_state_v1';
+
+let state = {};
+
+/* ── SAVE QUEUE ────────────────────────────────────────────────
+   Antes, o botão "Salvar treino completo" disparava um fetch() PUT
+   próprio, por fora do debounce normal — se um edit recente ainda
+   estivesse com o envio pendente, os dois podiam responder fora de
+   ordem e um sobrescrever o outro. Agora existe um único caminho de
+   salvamento: só um PUT em andamento por vez; se chegar um pedido novo
+   nesse meio tempo, ele espera terminar e reenvia o estado mais atual. */
+let saveTimer = null;
+let saveInFlight = false;
+let savePendingAfterFlight = false;
+
+async function loadState(){
+  const local = localStorage.getItem(LOCAL_KEY);
+  if(local){ try{ state = JSON.parse(local); }catch(e){ state = {}; } }
+  try{
+    const res = await fetch(STATE_URL);
+    if(res.ok){
+      const remote = await res.json();
+      if(remote){ state = Object.assign({}, state, remote); }
+    }
+    setSyncPill('sincronizado');
+  }catch(e){
+    setSyncPill('offline (local)');
+  }
+}
+
+function saveState(){
+  localStorage.setItem(LOCAL_KEY, JSON.stringify(state));
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(flushSaveToFirebase, 500);
+}
+
+function flushSaveToFirebase(){
+  if(saveInFlight){ savePendingAfterFlight = true; return; }
+  saveInFlight = true;
+  fetch(STATE_URL, {method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(state)})
+    .then(res => {
+      if(!res.ok) throw new Error('Firebase respondeu ' + res.status);
+      setSyncPill('sincronizado');
+    })
+    .catch(() => {
+      setSyncPill('offline (local)');
+      setTimeout(() => { saveState(); }, 2000);
+    })
+    .finally(() => {
+      saveInFlight = false;
+      if(savePendingAfterFlight){
+        savePendingAfterFlight = false;
+        flushSaveToFirebase();
+      }
+    });
+}
+
+function setSyncPill(txt){
+  document.getElementById('syncPill').textContent = txt;
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=> t.classList.remove('show'), 2200);
+}
+
+/* ============================================================
+   DADOS DOS TREINOS
+   ============================================================ */
+const WARMUPS = {
+  A: 'Aquecimento: mobilidade de ombro, joelho e punho/cotovelo + ativação leve de escápula antes da barra fixa.',
+  B: 'Aquecimento: rotação de manguito rotador com elástico + mobilidade de ombro antes da barra fixa e do supino.',
+  C: 'Aquecimento: mobilidade geral + ativação de glúteo e manguito rotador antes da barra fixa.',
+};
+
+const EXERCISES = {
+  A: [
+    {id:'principal', bloco:'PRINCIPAL', principal:true, nome:'Barra fixa', series:3, reps:'5', descanso:'2-3 min', rpe:'7-8', nota:'Pegada neutra (palmas viradas uma para a outra) — mais confortável para o cotovelo/rádio operado.'},
+    {id:'remada-baixa', bloco:'Costas', nome:'Remada baixa no cabo', series:3, reps:'10', descanso:'60s', rpe:'7-8', nota:'Se doer no braço operado, reduzir carga ou fazer unilateral.'},
+    {id:'agachamento', bloco:'Quadríceps', nome:'Agachamento', series:3, reps:'10', descanso:'60-90s', rpe:'7-8', nota:'Descer só até onde não houver dor no joelho direito.'},
+    {id:'leg-press', bloco:'Quadríceps', nome:'Leg press', series:3, reps:'10', descanso:'60s', rpe:'7-8'},
+    {id:'mesa-flexora', bloco:'Posterior', nome:'Mesa flexora', series:3, reps:'10', descanso:'60s', rpe:'7-8', nota:'Execução lenta na fase excêntrica.'},
+    {id:'rosca-barraw', bloco:'Bíceps', nome:'Rosca direta na barra W', series:3, reps:'10', descanso:'45-60s', rpe:'7-8', nota:'Pegada angulada é mais confortável para o cotovelo/rádio.'},
+    {id:'rosca-martelo', bloco:'Bíceps', nome:'Rosca martelo', series:3, reps:'10', descanso:'45-60s', rpe:'7-8'},
+    {id:'core-farmer', bloco:'Core', core:true, nome:"Farmer's walk", series:3, reps:'20-30m', descanso:'60s', rpe:'7', nota:'Pegada firme, sem exagerar no peso por causa do cotovelo/rádio.'},
+  ],
+  B: [
+    {id:'principal', bloco:'PRINCIPAL', principal:true, nome:'Barra fixa', series:3, reps:'5', descanso:'2-3 min', rpe:'7-8', nota:'Pegada neutra (palmas viradas uma para a outra) — mais confortável para o cotovelo/rádio operado.'},
+    {id:'supino-articulado', bloco:'Peito', nome:'Supino articulado (máquina)', series:3, reps:'10', descanso:'60-90s', rpe:'7-8', nota:'Não travar o cotovelo na subida; parar se doer no ombro esquerdo.'},
+    {id:'peck-deck', bloco:'Peito', nome:'Peck deck', series:3, reps:'10', descanso:'60s', rpe:'7-8'},
+    {id:'desenvolvimento', bloco:'Ombro', nome:'Desenvolvimento', series:3, reps:'10', descanso:'60s', rpe:'7', nota:'Reduzir amplitude se doer o ombro esquerdo.'},
+    {id:'elevacao-lateral', bloco:'Ombro', nome:'Elevação lateral', series:3, reps:'10', descanso:'45-60s', rpe:'7'},
+    {id:'triceps-corda', bloco:'Tríceps', nome:'Tríceps corda', series:3, reps:'10', descanso:'45-60s', rpe:'7-8'},
+    {id:'triceps-testa', bloco:'Tríceps', nome:'Tríceps testa na polia', series:3, reps:'10', descanso:'45-60s', rpe:'7', nota:'Amplitude reduzida se sentir desconforto no cotovelo/rádio.'},
+    {id:'elevacao-pelvica', bloco:'Glúteo', nome:'Elevação pélvica', series:3, reps:'10', descanso:'60s', rpe:'7-8'},
+    {id:'terra-romeno', bloco:'Posterior', nome:'Terra romeno (RDL)', series:3, reps:'10', descanso:'60-90s', rpe:'7-8', nota:'Carga moderada, foco no glúteo/posterior.'},
+    {id:'core-pallof', bloco:'Core', core:true, nome:'Pallof press', series:3, reps:'10', descanso:'45-60s', rpe:'7', nota:'Resistir à rotação do tronco, cotovelos próximos ao corpo.'},
+  ],
+  C: [
+    {id:'principal', bloco:'PRINCIPAL', principal:true, nome:'Barra fixa', series:3, reps:'5', descanso:'2-3 min', rpe:'7-8', nota:'Pegada neutra (palmas viradas uma para a outra) — mais confortável para o cotovelo/rádio operado.'},
+    {id:'remada-supinada', bloco:'Costas', nome:'Remada supinada na máquina', series:3, reps:'10', descanso:'60-90s', rpe:'7-8', nota:'Pegada supinada costuma ser confortável para o cotovelo operado.'},
+    {id:'agachamento-sumo', bloco:'Quadríceps', nome:'Agachamento sumo', series:3, reps:'10', descanso:'60-90s', rpe:'7-8', nota:'Pés mais afastados reduzem a exigência do joelho.'},
+    {id:'cadeira-flexora', bloco:'Posterior', nome:'Cadeira flexora', series:3, reps:'10', descanso:'60s', rpe:'7-8'},
+    {id:'elevacao-frontal', bloco:'Ombro', nome:'Elevação frontal', series:3, reps:'10', descanso:'45-60s', rpe:'7'},
+    {id:'crucifixo-inverso', bloco:'Ombro', nome:'Crucifixo inverso na máquina', series:3, reps:'10', descanso:'45-60s', rpe:'7'},
+    {id:'rosca-punho', bloco:'Antebraço', nome:'Rosca de punho', series:3, reps:'10', descanso:'45s', rpe:'7', nota:'Carga leve — fortalece a região do braço operado.'},
+    {id:'rotacao-punho', bloco:'Antebraço', nome:'Rotação de punho', series:3, reps:'10', descanso:'45s', rpe:'7'},
+    {id:'core-perna', bloco:'Core', core:true, nome:'Elevação de pernas', series:3, reps:'12-15', descanso:'45-60s', rpe:'7'},
+  ],
+};
+
+const GUIA_EXECUCAO = [
+  ['Barra fixa (principal)', 'Pegada pronada, largura dos ombros, puxar até o queixo passar a barra, descer com controle até a extensão completa.', 'Pegada neutra (palmas viradas uma para a outra) é a mais confortável para o cotovelo/rádio operado.'],
+  ['Agachamento', 'Pés na largura dos ombros, ponta projetada para fora, descer controlado mantendo a coluna neutra, joelhos alinhados com a ponta dos pés.', 'Descer só até onde não houver dor no joelho direito.'],
+  ['Agachamento sumo', 'Pés bem mais afastados que os ombros, pontas viradas para fora, descer mantendo o tronco ereto.', 'Reduz a flexão profunda do joelho comparado ao agachamento tradicional.'],
+  ['Leg press', 'Pés na plataforma na largura dos ombros, descer controlado, sem travar os joelhos na subida.', 'Ajustar profundidade conforme sensação no joelho direito.'],
+  ['Mesa / Cadeira flexora', 'Flexionar o joelho contraindo o posterior de coxa, evitar impulso.', 'Execução lenta na fase excêntrica — protege o joelho.'],
+  ['Remada baixa / supinada', 'Tronco ereto, puxar até o abdômen, escápulas fechando ao final.', 'Se doer no braço operado, reduzir carga ou fazer unilateral.'],
+  ['Supino articulado', 'Escápulas retraídas, empurrar sem travar o cotovelo com força no topo.', 'Parar se sentir dor no ombro esquerdo ou cotovelo.'],
+  ['Peck deck', 'Cotovelos levemente flexionados, aproximar os braços à frente do peito.', 'Evitar abrir demais no alongamento se incomodar o ombro.'],
+  ['Desenvolvimento', 'Empurrar o peso à frente/acima em ângulo confortável, sem travar o cotovelo.', 'Reduzir amplitude se causar dor no ombro esquerdo.'],
+  ['Elevação lateral / frontal', 'Cotovelos levemente flexionados, elevar até a altura do ombro, descer controlado, com o tronco levemente projetado à frente.', 'Carga leve; interromper se houver dor no ombro esquerdo.'],
+  ['Crucifixo inverso', 'Puxar os braços para trás em arco, aproximando as escápulas — manter a escápula contraída durante todo o exercício.', 'Bom para postura, baixo risco articular.'],
+  ['Tríceps corda / testa', 'Cotovelos fixos, estender o antebraço sem abrir os cotovelos.', 'Reduzir amplitude se incomodar o cotovelo/rádio.'],
+  ['Rosca direta / martelo', 'Cotovelos fixos ao lado do corpo, flexionar sem balançar o tronco.', 'Barra W e pegada neutra são mais confortáveis para o cotovelo.'],
+  ['Elevação pélvica', 'Empurrar o quadril para cima contraindo o glúteo no topo, com força de impulso pelo calcanhar.', 'Fortalece glúteo sem sobrecarregar o joelho.'],
+  ['Terra romeno (RDL)', 'Quadril para trás, barra/halteres próximos às pernas, coluna neutra.', 'Carga moderada, foco no glúteo/posterior.'],
+  ['Rosca / rotação de punho', 'Movimento controlado de flexão, extensão ou rotação do punho.', 'Carga leve — fortalece a região próxima à fratura antiga.'],
+  ["Farmer's walk", 'Segurar peso em cada mão, caminhar com tronco ereto e core contraído.', 'Pegada firme, sem exagerar no peso por causa do cotovelo/rádio.'],
+  ['Pallof press', 'Segurar o cabo/elástico na altura do peito, estender os braços à frente resistindo à rotação do tronco.', 'Cotovelos próximos ao corpo — bom exercício anti-rotação, baixo risco articular.'],
+  ['Elevação de pernas', 'Elevar as pernas contraindo o abdômen, descer controlado — pegada neutra de preferência.', 'Monitorar a sustentação do braço operado.'],
+];
+
+const RPE_TABLE = [
+  ['5-6', 'Esforço leve, aquecimento — dá para conversar normalmente.'],
+  ['7', 'Esforço moderado — últimas 2-3 reps exigem foco, mas controladas.'],
+  ['7-8', 'Esforço consistente — série desafiadora perto do final.'],
+  ['8', 'Esforço alto — só 1-2 reps a mais seriam possíveis.'],
+  ['9', 'Quase máximo — apenas 1 rep a mais possível.'],
+  ['10', 'Esforço máximo — evitar neste plano.'],
+];
+
+/* ============================================================
+   RENDER — TREINO
+   ============================================================ */
+let currentTreino = 'A';
+let currentWeek = 1;
+
+function stateKey(exId){ return `w${currentWeek}-${currentTreino}-${exId}`; }
+
+function renderTreino(){
+  document.getElementById('weekLabel').textContent = `Semana ${currentWeek} / 30`;
+  document.getElementById('weekMinus').style.opacity = currentWeek<=1 ? '0.4' : '1';
+  document.getElementById('weekPlus').style.opacity = currentWeek>=30 ? '0.4' : '1';
+
+  const completoKey = `w${currentWeek}-${currentTreino}-completo`;
+  const btnSalvar = document.getElementById('btnSalvarTreino');
+  if(state[completoKey] && state[completoKey].done){
+    btnSalvar.textContent = 'Treino salvo ✓ (salvar de novo)';
+    btnSalvar.style.background = 'linear-gradient(155deg, var(--success), #1B9E6F)';
+  } else {
+    btnSalvar.textContent = 'Salvar treino completo';
+    btnSalvar.style.background = '';
+  }
+  document.getElementById('warmupNote').innerHTML = '<b>Aquecimento —</b> ' + WARMUPS[currentTreino];
+
+  const list = document.getElementById('exerciseList');
+  list.innerHTML = '';
+  EXERCISES[currentTreino].forEach(ex=>{
+    const key = stateKey(ex.id);
+    const saved = state[key] || {done:false, load:''};
+
+    const card = document.createElement('div');
+    card.className = 'ex-card' + (saved.done ? ' done' : '') + (ex.principal ? ' principal' : '');
+
+    card.innerHTML = `
+      <div class="ex-top">
+        <div class="checkbox ${saved.done?'checked':''}" data-ex="${ex.id}">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+        </div>
+        <div class="ex-info">
+          <div class="ex-tag ${ex.core?'core':''}">${ex.bloco}</div>
+          <div class="ex-name">${ex.nome}</div>
+          ${ex.nota ? `<div class="ex-note">${ex.nota}</div>` : ''}
+        </div>
+      </div>
+      <div class="ex-stats">
+        <div class="stat"><div class="v">${ex.series}</div><div class="l">séries</div></div>
+        <div class="stat"><div class="v">${ex.reps}</div><div class="l">reps</div></div>
+        <div class="stat"><div class="v">${ex.descanso}</div><div class="l">descanso</div></div>
+        <div class="stat"><div class="v">${ex.rpe}</div><div class="l">RPE</div></div>
+      </div>
+      <div class="peso-row">
+        <label>Carga</label>
+        <input type="text" inputmode="decimal" placeholder="ex: 20" data-load="${ex.id}" value="${saved.load||''}">
+        <span class="unit">kg</span>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+
+  list.querySelectorAll('.checkbox').forEach(cb=>{
+    cb.addEventListener('click', ()=>{
+      const exId = cb.dataset.ex;
+      const key = stateKey(exId);
+      const cur = state[key] || {done:false, load:''};
+      cur.done = !cur.done;
+      state[key] = cur;
+      saveState();
+      renderTreino();
+    });
+  });
+  list.querySelectorAll('[data-load]').forEach(inp=>{
+    inp.addEventListener('input', ()=>{
+      const exId = inp.dataset.load;
+      const key = stateKey(exId);
+      const cur = state[key] || {done:false, load:''};
+      cur.load = inp.value;
+      state[key] = cur;
+      saveState();
+    });
+  });
+}
+
+document.getElementById('treinoSegment').addEventListener('click', (e)=>{
+  const btn = e.target.closest('button');
+  if(!btn) return;
+  document.querySelectorAll('#treinoSegment button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  currentTreino = btn.dataset.treino;
+  renderTreino();
+});
+
+document.getElementById('weekMinus').addEventListener('click', ()=>{
+  if(currentWeek>1){ currentWeek--; renderTreino(); }
+});
+document.getElementById('weekPlus').addEventListener('click', ()=>{
+  if(currentWeek<30){ currentWeek++; renderTreino(); }
+});
+
+document.getElementById('btnSalvarTreino').addEventListener('click', ()=>{
+  const key = `w${currentWeek}-${currentTreino}-completo`;
+  state[key] = { done:true, data: new Date().toISOString() };
+  saveState();
+  showToast('Treino salvo ✅');
+  renderTreino();
+});
+
+/* ============================================================
+   RENDER — GUIA
+   ============================================================ */
+function renderGuia(){
+  const exec = document.getElementById('sub-execucao');
+  exec.innerHTML = GUIA_EXECUCAO.map(([nome,how,care])=>`
+    <div class="guia-card">
+      <div class="g-name">${nome}</div>
+      <div class="g-how">${how}</div>
+      <div class="g-care">⚠ ${care}</div>
+    </div>
+  `).join('');
+
+  const rpe = document.getElementById('rpeList');
+  rpe.innerHTML = RPE_TABLE.map(([val,desc])=>`
+    <div class="rpe-row">
+      <div class="rpe-badge">${val}</div>
+      <div class="rpe-text">${desc}</div>
+    </div>
+  `).join('');
+}
+
+document.querySelectorAll('.subtabs button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.subtabs button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.subview').forEach(v=>v.classList.remove('active'));
+    document.getElementById('sub-'+btn.dataset.sub).classList.add('active');
+  });
+});
+
+/* ============================================================
+   AVALIAÇÃO
+   ============================================================ */
+const evalSel = {humor:null, sono:null, alimentacao:null, energia:null};
+
+document.querySelectorAll('.scale5').forEach(group=>{
+  const field = group.dataset.field;
+  group.querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      group.querySelectorAll('button').forEach(b=>b.classList.remove('sel'));
+      btn.classList.add('sel');
+      evalSel[field] = btn.dataset.val;
+    });
+  });
+});
+
+document.getElementById('btnEnviarAvaliacao').addEventListener('click', ()=>{
+  // NOTE: a chave da semana era antes `w${currentWeek}` (ex: "w1"), e o
+  // dashboard usa parseInt() nessa chave para saber a semana — parseInt("w1")
+  // dá NaN, então a avaliação nunca aparecia corretamente. Agora usa o
+  // número puro da semana, igual aos outros apps. Os nomes das categorias
+  // "frequencia" e "alimentacao" também foram ajustados para a grafia com
+  // acento que o dashboard reconhece.
+  const weekKey = currentWeek;
+  const frequencia = document.getElementById('evalFrequencia').value;
+  const obs = document.getElementById('evalObs').value;
+
+  if(!evalSel.humor || !evalSel.sono || !evalSel.alimentacao || !evalSel.energia){
+    showToast('Preencha todas as escalas antes de enviar');
+    return;
+  }
+
+  if(!state.evalNotas) state.evalNotas = {};
+  if(!state.evalObs) state.evalObs = {};
+
+  state.evalNotas[weekKey] = {
+    'frequência': Number(frequencia),
+    humor: Number(evalSel.humor),
+    sono: Number(evalSel.sono),
+    'alimentação': Number(evalSel.alimentacao),
+    energia: Number(evalSel.energia),
+    enviadoEm: new Date().toISOString(),
+  };
+  state.evalObs[weekKey] = obs;
+
+  saveState();
+  showToast('Avaliação enviada!');
+});
+
+/* ============================================================
+   PERFIL — PESO EDITÁVEL
+   ============================================================ */
+const pesoInput = document.getElementById('pesoInput');
+pesoInput.addEventListener('input', ()=>{
+  state.peso = pesoInput.value;
+  saveState();
+});
+
+/* ============================================================
+   NAVEGAÇÃO — TABBAR
+   ============================================================ */
+document.querySelectorAll('nav.tabbar button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('nav.tabbar button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.getElementById('view-'+btn.dataset.view).classList.add('active');
+  });
+});
+
+/* ============================================================
+   INIT
+   ============================================================ */
+(async function init(){
+  await loadState();
+  if(state.peso){ pesoInput.value = state.peso; }
+  renderTreino();
+  renderGuia();
+})();
+</script>
+</body>
+</html>
